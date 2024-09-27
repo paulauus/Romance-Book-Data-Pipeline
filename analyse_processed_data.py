@@ -5,6 +5,8 @@ import altair as alt
 import os
 
 
+
+
 def load_processed_data(file_path):
     """Load the processed data from the given CSV file."""
     if not os.path.exists(file_path):
@@ -29,8 +31,26 @@ def plot_decade_releases(df):
 
     chart.save('data/decade_releases.png')
 
+
+def plot_top_authors(df):
+    """Create a bar chart showing the top 10 most-rated authors."""
+    top_authors = df.groupby('author_name')['ratings'].sum().reset_index()
+    top_authors = top_authors.nlargest(10, 'ratings')
+
+    chart = alt.Chart(top_authors).mark_bar(color='#E0B0FF').encode(
+        x=alt.X('ratings:Q', title='Total Ratings'),
+        y=alt.Y('author_name:N', sort='-x', title='Author'),
+        tooltip=['author_name', 'ratings']
+    ).properties(
+        title='Top 10 Most-Rated Authors'
+    )
+
+    chart.save('data/top_authors.png')
+
+
 if __name__ == "__main__":
     
     data = load_processed_data("data/PROCESSED_DATA.csv")
 
     plot_decade_releases(data)
+    plot_top_authors(data)
