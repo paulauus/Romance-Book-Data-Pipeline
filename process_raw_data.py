@@ -9,8 +9,8 @@ import pandas as pd
 
 def clean_title(title):
     """Remove any text in brackets from the title."""
-    if pd.isna(title) or not isinstance(title, str):
-        return ""
+    if pd.isna(title) or not isinstance(title, str) or title.strip() == "":
+        return None
     return re.sub(r'\s*\[.*?\]\s*|\s*\(.*?\)\s*', '', title).strip()
 
 
@@ -23,6 +23,52 @@ def get_author_name(author_id):
     connection.close()
     return result[0] if result else None
 
+
+def clean_numeric_int(value):
+    """Clean numeric values by removing commas, backticks, and other unwanted characters."""
+    if pd.isna(value):
+        return None
+    # Remove backticks and commas, and convert to float
+    value = re.sub(r'[`,]', '', str(value))
+    try:
+        return int(value)
+    except ValueError:
+        return None
+    
+def clean_numeric_float(value):
+    """Turn a string into a float."""
+    return float(value.replace(",", "."))
+
+
+def process_raw_data(file_path):
+    """Process the raw CSV file and output the cleaned data."""
+    # Load the raw data
+    df = pd.read_csv(file_path)
+
+    # Clean the data
+    df['book_title'] = df['book_title'].apply(clean_title)
+    df['author_name'] = df['author_id'].apply(get_author_name)
+
+    # Remove rows with missing title or author
+    df = df.dropna(subset=['book_title', 'author_name'])
+
+    # Clean and convert numeric columns
+    df['ratings'] = df['ratings'].apply(clean_numeric_int)
+    df['Rating'] = df['Rating'].apply(clean_numeric_float)
+
+    # Select required columns and rename them
+    df = df[['book_title', 'author_name', 'Year released', 'Rating', 'ratings']]
+    df.columns = ['title', 'author_name', 'year', 'rating', 'ratings']
+
+    # Sort by rating in descending order
+    df = df.sort_values(by='rating', ascending=False).dropna()
+
+    # Save the cleaned data to a new CSV file
+    output_file = 'data/PROCESSED_DATA.csv'
+    df.to_csv(output_file, index=False)
+    print(f"Processed data saved to {output_file}")
+
 if __name__ == "__main__":
     print(clean_title("Five Feet Apart(ebook)"))
     print(get_author_name(10))
+    print(process_raw_data("data/RAW_DATA_0.csv"))
