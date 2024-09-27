@@ -8,33 +8,33 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 
 
-def extract_keywords(title):
+def extract_keywords(book_title):
     """Extract keywords from a title using spaCy."""
-    doc = nlp(title)
+    doc = nlp(book_title)
     # Extract words that are not stop words or punctuation
     keywords = [token.text.lower()
                 for token in doc if not token.is_stop and not token.is_punct]
     return keywords
 
 
-def get_top_keywords(df, title_column):
+def get_top_keywords(df, book_title):
     """Get the top keywords from the specified book title column."""
     all_keywords = []
-    for title in df[title_column].dropna():
-        all_keywords.extend(extract_keywords(title))
+    for book_title in df[book_title].dropna():
+        all_keywords.extend(extract_keywords(book_title))
 
     keyword_counts = pd.Series(all_keywords).value_counts()
     return keyword_counts.head(20)
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('data/PROCESSED_DATA.csv')
+    book_df = pd.read_csv('data/PROCESSED_DATA.csv')
 
     # Specify the correct title column name
-    title_column = 'title'
+    TITLE = 'title'
 
     # Get the top keywords
-    top_keywords = get_top_keywords(df, title_column)
+    top_keywords = get_top_keywords(book_df, TITLE)
 
     # Create a DataFrame for plotting
     keywords_df = top_keywords.reset_index()
