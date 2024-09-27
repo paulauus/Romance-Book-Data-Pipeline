@@ -1,7 +1,6 @@
 """A script to process book data."""
 
 import argparse
-import os
 import sqlite3
 import re
 import pandas as pd
@@ -21,6 +20,7 @@ def get_author_name(author_id):
     cursor.execute("SELECT name FROM author WHERE id=?", (author_id,))
     result = cursor.fetchone()
     connection.close()
+    # Remove extra spaces from names
     return " ".join(result[0].split()) if result else None
 
 
@@ -34,7 +34,8 @@ def clean_numeric_int(value):
         return int(value)
     except ValueError:
         return None
-    
+
+
 def clean_numeric_float(value):
     """Turn a string into a float."""
     return float(value.replace(",", "."))
