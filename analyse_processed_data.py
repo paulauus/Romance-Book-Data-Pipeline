@@ -1,11 +1,22 @@
 """A script to analyse book data."""
 
+import os
 import pandas as pd
 import altair as alt
-import os
 
 
-
+pastel_colors = [
+    '#FFDAC1',  # Pastel Orange
+    '#A3C1DA',  # Pastel Blue
+    '#F9EFAF',  # Pastel Yellow
+    '#B7E0B0',  # Pastel Green
+    '#D1A6E2',  # Pastel Purple
+    '#FFB2B2',  # Pastel Coral
+    '#D3C6E5',  # Pastel Lilac
+    '#d68ba5',  # Pastel Red
+    '#E0B0FF',  # Mauve
+    '#B2F7EF',  # Pastel Mint
+]
 
 def load_processed_data(file_path):
     """Load the processed data from the given CSV file."""
@@ -23,7 +34,8 @@ def plot_decade_releases(df):
 
     chart = alt.Chart(decade_counts).mark_arc().encode(
         theta=alt.Theta(field='count', type='quantitative'),
-        color=alt.Color(field='decade', type='nominal'),
+        color=alt.Color(field="decade", type="nominal",
+                        scale=alt.Scale(range=pastel_colors)),
         tooltip=['decade', 'count']
     ).properties(
         title='Proportion of Books Released in Each Decade'
@@ -49,7 +61,6 @@ def plot_top_authors(df):
 
 
 if __name__ == "__main__":
-    
     data = load_processed_data("data/PROCESSED_DATA.csv")
 
     plot_decade_releases(data)
