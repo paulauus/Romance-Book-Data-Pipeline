@@ -21,7 +21,7 @@ def get_author_name(author_id):
     cursor.execute("SELECT name FROM author WHERE id=?", (author_id,))
     result = cursor.fetchone()
     connection.close()
-    return result[0] if result else None
+    return " ".join(result[0].split()) if result else None
 
 
 def clean_numeric_int(value):
@@ -68,7 +68,13 @@ def process_raw_data(file_path):
     df.to_csv(output_file, index=False)
     print(f"Processed data saved to {output_file}")
 
+
 if __name__ == "__main__":
-    print(clean_title("Five Feet Apart(ebook)"))
-    print(get_author_name(10))
-    print(process_raw_data("data/RAW_DATA_0.csv"))
+
+    parser = argparse.ArgumentParser(description="Process raw book data CSV.")
+    parser.add_argument('file_path', type=str,
+                        help="Path to the raw data CSV file.")
+
+    args = parser.parse_args()
+
+    process_raw_data(args.file_path)
